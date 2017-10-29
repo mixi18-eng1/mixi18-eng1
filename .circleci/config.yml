@@ -38,7 +38,7 @@ jobs:
           name: Empty Commit and Push
           command: |
             chmod +x .circleci/git-empty-commit.sh
-            cat .circleci/branches | xargs ./.circleci/git-empty-commit.sh
+            <.circleci/branches xargs -I % ./.circleci/git-empty-commit.sh %
 
 workflows:
   version: 2
