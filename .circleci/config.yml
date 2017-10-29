@@ -1,0 +1,60 @@
+version: 2
+jobs:
+  build:
+    working_directory: /app
+    docker:
+      - image: buildpack-deps:scm
+    steps:
+      - checkout
+      - run:
+          name: noope
+          command: echo noope      
+  
+  approve:
+    working_directory: /app
+    docker:
+      - image: buildpack-deps:scm
+    steps:
+      - run:
+          name: noope
+          command: echo noope
+
+  deploy:
+    working_directory: /app
+    docker:
+      - image: buildpack-deps:scm
+    steps:
+      - add-ssh-keys:
+          fingerprints:
+            - "54:02:33:28:1b:1f:fd:93:44:fd:52:93:22:e3:f5:ad"
+      - checkout
+      - run:
+          name: Config for git
+          command: |
+            git config --global user.name "$USER_NAME"
+            git config --global user.email "$EMAIL"
+            git config core.filemode false
+      - run:
+          name: Empty Commit and Push
+          command: |
+            chmod +x .circleci/git-empty-commit.sh
+            cat .circleci/branches | xargs ./.circleci/git-empty-commit.sh
+
+workflows:
+  version: 2
+  git-push:
+    jobs:
+      - build
+      - approve:
+          requires:
+            - build
+          type: approval
+          filters:
+            branches:
+              only: circleci
+      - deploy:
+          requires:
+            - approve
+          filters:
+            branches:
+              only: circleci
