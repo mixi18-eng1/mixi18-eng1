@@ -33,11 +33,12 @@ jobs:
           command: |
             git config --global user.name "$USER_NAME"
             git config --global user.email "$EMAIL"
-            git config core.filemode false
+            chmod +x .circleci/git-empty-commit.sh
+            git add .
+            git commit -m "Fix permission"
       - run:
           name: Empty Commit and Push
           command: |
-            chmod +x .circleci/git-empty-commit.sh
             <.circleci/branches xargs -I % ./.circleci/git-empty-commit.sh %
 
 workflows:
